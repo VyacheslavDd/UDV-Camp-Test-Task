@@ -7,6 +7,8 @@ services:
   udv-camp-test-task:
     image: udvcamptesttask:latest
     container_name: UDVBackend
+    restart: always
+    env_file: "UDV-Camp-Test-Task/.env"
     networks:
         - udvtask
     ports:

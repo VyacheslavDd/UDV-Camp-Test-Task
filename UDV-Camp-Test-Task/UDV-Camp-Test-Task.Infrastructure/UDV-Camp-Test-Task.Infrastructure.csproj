@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\UDV-Camp-Test-Task.Domain\UDV-Camp-Test-Task.Domain.csproj" />
     <ProjectReference Include="..\UDV-Camp-Test-Task.Services\UDV-Camp-Test-Task.Services.csproj" />
   </ItemGroup>
