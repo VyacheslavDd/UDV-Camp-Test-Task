@@ -1,0 +1,33 @@
+version: '3.4'
+
+networks:
+  udvtask:
+
+services:
+  udv-camp-test-task:
+    image: udvcamptesttask:latest
+    container_name: UDVBackend
+    networks:
+        - udvtask
+    ports:
+        - "5000:5000"
+    build:
+      context: .
+      dockerfile: UDV-Camp-Test-Task/Dockerfile
+    depends_on:
+        - udv-camp-test-task-db
+
+  udv-camp-test-task-db:
+    image: postgres:latest
+    container_name: UDVBackendDB
+    networks:
+        - udvtask
+    ports:
+        - "5432:5432"
+    volumes:
+        - "./volumes/pgdata:/var/lib/postgresql/data"
+    environment:
+        - POSTGRES_DB=UDVBackendDB
+        - POSTGRES_USER=UDVUser
+        - POSTGRES_PASSWORD=UDVPassword
+ 
