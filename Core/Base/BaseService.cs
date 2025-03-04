@@ -18,6 +18,8 @@ namespace Core.Base
 		protected readonly IRepository<T> _repository = repository;
 		protected readonly ILogger _logger = logger;
 
+		protected string Type => GetType().Name;
+
 		public virtual async Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
 		{
 			return await _repository.GetAll().ToListAsync(cancellationToken);
@@ -25,8 +27,6 @@ namespace Core.Base
 
 		public virtual async Task<Result<Guid>> AddAsync(T entity)
 		{
-			var validationResult = await ValidateAsync(entity);
-			if (!validationResult.IsSuccess) return Result.Failure<Guid>(validationResult.Error);
 			var answer = await _repository.AddAsync(entity);
 			return Result.Success(answer);
 		}
@@ -37,16 +37,6 @@ namespace Core.Base
 			await _repository.SaveChangesAsync();
 		}
 
-		public virtual Task<Result> NotBulkUpdateAsync(Guid entityId, T updateRequest)
-		{
-			return Task.FromResult(Result.Success());
-		}
-
-		public virtual async Task<Result> NotBulkDeleteAsync(Guid entityId)
-		{
-			return await _repository.NotBulkDeleteAsync(_idSelectorExpression(entityId));
-		}
-
 		public virtual async Task<T?> GetByGuidAsync(Guid id, CancellationToken cancellationToken)
 		{
 			return await _repository.GetBySelectorAsync(_idSelectorExpression(id), cancellationToken);
@@ -54,17 +44,13 @@ namespace Core.Base
 
 		public virtual async Task<Result<string>> BulkDeleteAsync(Guid entityId)
 		{
-			var deletedRowsCount = await _repository.BulkDeleteAsync(_idSelectorExpression(entityId));
+			var deletedRowsCount = await _repository.ExecuteDeleteAsync(_idSelectorExpression(entityId));
 			return Result.Success($"Удалено строк: {deletedRowsCount}");
 		}
 
 		public virtual Task<Result<string>> BulkUpdateAsync(Guid entityId, T updateRequest)
 		{
 			return Task.FromResult(Result.Success("Обновлено строк: 0"));
-		}
-		public virtual Task<Result<string>> ValidateAsync(T entity, bool fromUpdate=false)
-		{
-			return Task.FromResult(Result.Success("Success"));
 		}
 	}
 }

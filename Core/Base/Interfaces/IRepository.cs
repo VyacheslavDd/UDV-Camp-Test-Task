@@ -13,13 +13,9 @@ namespace Core.Base.Interfaces
 	{
 		IQueryable<T> GetAll();
 		Task<T?> GetBySelectorAsync(Expression<Func<T, bool>> selector, CancellationToken cancellationToken);
-		IQueryable<T> GetAllWithInclude<TProperty>(Expression<Func<T, TProperty>> includeExpression);
-		Task<T?> GetBySelectorWithIncludeAsync<TProperty>(Expression<Func<T, bool>> selector, Expression<Func<T, TProperty>> includeExpression,
-			CancellationToken cancellationToken);
 		Task<Guid> AddAsync(T entity);
 		Task<int> ExecuteUpdateAsync(Expression<Func<T, bool>> selector, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> updateInstructions);
-		Task<int> BulkDeleteAsync(Expression<Func<T, bool>> selector);
-		Task<Result> NotBulkDeleteAsync(Expression<Func<T, bool>> selector);
+		Task<int> ExecuteDeleteAsync(Expression<Func<T, bool>> selector);
 		Task SaveChangesAsync();
 	}
 }

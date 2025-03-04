@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UDV_Camp_Test_Task.Infrastructure;
@@ -11,9 +12,11 @@ using UDV_Camp_Test_Task.Infrastructure;
 namespace UDV_Camp_Test_Task.Infrastructure.Migrations
 {
     [DbContext(typeof(UDVAppContext))]
-    partial class UDVAppContextModelSnapshot : ModelSnapshot
+    [Migration("20250304100713_time-field")]
+    partial class timefield
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

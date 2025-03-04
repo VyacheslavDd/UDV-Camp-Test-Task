@@ -13,5 +13,6 @@ namespace UDV_Camp_Test_Task.Domain.Models
 	public class LettersCountResult: Entity<Guid>
 	{
 		public string Result { get; set; }
+		public DateTime CalculatedAt { get; set; }
 	}
 }

@@ -26,17 +26,6 @@ namespace Core.Base
 			return await _dbSet.Where(selector).FirstOrDefaultAsync(cancellationToken);
 		}
 
-		public virtual IQueryable<T> GetAllWithInclude<TProperty>(Expression<Func<T, TProperty>> includeExpression)
-		{
-			return _dbSet.Include(includeExpression);
-		}
-
-		public virtual async Task<T?> GetBySelectorWithIncludeAsync<TProperty>(Expression<Func<T, bool>> selector, Expression<Func<T, TProperty>> includeExpression,
-			CancellationToken cancellationToken)
-		{
-			return await _dbSet.Where(selector).Include(includeExpression).FirstOrDefaultAsync(cancellationToken);
-		}
-
 		public virtual async Task<Guid> AddAsync(T entity)
 		{
 			var createdEntity = await _dbSet.AddAsync(entity);
@@ -49,18 +38,9 @@ namespace Core.Base
 			return await _dbSet.Where(selector).ExecuteUpdateAsync(updateInstructions);
 		}
 
-		public virtual async Task<int> BulkDeleteAsync(Expression<Func<T, bool>> selector)
+		public virtual async Task<int> ExecuteDeleteAsync(Expression<Func<T, bool>> selector)
 		{
 			return await _dbSet.Where(selector).ExecuteDeleteAsync();
-		}
-
-		public virtual async Task<Result> NotBulkDeleteAsync(Expression<Func<T, bool>> selector)
-		{
-			var entities = await _dbSet.Where(selector).ToListAsync();
-			if (entities.Count == 0) return Result.Failure("Отсутствуют сущности для удаления");
-			_dbSet.RemoveRange(entities);
-			await SaveChangesAsync();
-			return Result.Success();
 		}
 
 		public virtual async Task SaveChangesAsync()
