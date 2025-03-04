@@ -31,25 +31,9 @@ namespace UDV_Camp_Test_Task.Services.StatisticsService
 
 		public async Task<Result<LettersCountResultOutDTO>> CalculateIdenticalLettersResultAsync(PostsFilter postsFilter)
 		{
-			_logger.Information("{@service}: Получение данных о постах пользователя...", Type);
 			var postsResponse = await GetPostsData();
 			if (postsResponse == null || postsResponse.Response == null) return Result.Failure<LettersCountResultOutDTO>("Не удалось получить корректный ответ от API");
-			_logger.Information("{@service}: Запуск подсчета...", Type);
-			var postTexts = postsResponse.Response.Items
-				.OrderByDescending(p => p.Date)
-				.Select(p => p.Text.ToLowerInvariant())
-				.Take(postsFilter.Count)
-				.ToList();
-			var lettersCountDictionary = new SortedDictionary<char, int>();
-			foreach (var text in postTexts)
-			{
-				foreach (var chr in text)
-				{
-					if (char.IsLetter(chr))
-						lettersCountDictionary.AddWithConditions(chr, (c) => lettersCountDictionary[c] = 1, (c) => lettersCountDictionary[c]++);
-				}
-			};
-			var lettersCountResult = new LettersCountResult() { CalculatedAt = DateTime.UtcNow, Result = string.Join(" ", lettersCountDictionary) };
+			var lettersCountResult = GetIdenticalLettersResult(postsResponse, postsFilter.Count);
 			var createdResult = await AddAsync(lettersCountResult);
 			if (createdResult.IsSuccess)
 			{
@@ -62,10 +46,31 @@ namespace UDV_Camp_Test_Task.Services.StatisticsService
 
 		private async Task<VkPostsResponse?> GetPostsData()
 		{
+			_logger.Information("{@service}: Получение данных о постах пользователя...", Type);
 			var accessToken = Environment.GetEnvironmentVariable(Const.AccessToken) ?? "";
 			var userDomain = _configuration[Const.VkUserDomain];
 			var query = $"?access_token={accessToken}&domain={userDomain}&v=5.199";
 			return await _httpClientService.GetAsync<VkPostsResponse>(_configuration[Const.VkHttpClientName], _configuration[Const.WallMethodName] + query);
+		}
+
+		private LettersCountResult GetIdenticalLettersResult(VkPostsResponse vkPostsResponse, int takePostsCount)
+		{
+			_logger.Information("{@service}: Запуск подсчета...", Type);
+			var postTexts = vkPostsResponse.Response.Items
+				.OrderByDescending(p => p.Date)
+				.Select(p => p.Text.ToLowerInvariant())
+				.Take(takePostsCount)
+				.ToList();
+			var lettersCountDictionary = new SortedDictionary<char, int>();
+			foreach (var text in postTexts)
+			{
+				foreach (var chr in text)
+				{
+					if (char.IsLetter(chr))
+						lettersCountDictionary.AddWithConditions(chr, (c) => lettersCountDictionary[c] = 1, (c) => lettersCountDictionary[c]++);
+				}
+			};
+			return new LettersCountResult() { CalculatedAt = DateTime.UtcNow, Result = string.Join(" ", lettersCountDictionary) };
 		}
 	}
 }
